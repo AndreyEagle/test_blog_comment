@@ -1,6 +1,7 @@
 from django.contrib import admin
 from posts.models import Post, Comment
 
+
 class PostAdmin(admin.ModelAdmin):
     list_display = (
         'author',
@@ -8,7 +9,6 @@ class PostAdmin(admin.ModelAdmin):
         'pub_date',
     )
     empty_value_display = '-пусто-'
-
 
 
 class CommentAdmin(admin.ModelAdmin):

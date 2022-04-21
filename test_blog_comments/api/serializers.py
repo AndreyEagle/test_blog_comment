@@ -6,6 +6,13 @@ from rest_framework.relations import SlugRelatedField
 User = get_user_model()
 
 
+class FilterCommentListSerializer(serializers.ListSerializer):
+
+    def to_representation(self, data):
+        data = data.filter(parent=None)
+        return super().to_representation(data)
+
+
 class PostSerializer(serializers.ModelSerializer):
     author = SlugRelatedField(slug_field='username', read_only=True)
     comments = serializers.SerializerMethodField(
@@ -23,7 +30,10 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
 
     def get_comments(self, obj):
-        queryset = Comment.objects.filter(post=obj, parent=None)
+        queryset = obj.comments.all().select_related(
+            'author',
+            'parent',
+        )
         return CommentSerializer(queryset, many=True).data
 
 
@@ -37,7 +47,7 @@ class CommentSerializer(serializers.ModelSerializer):
     children = CommentChildrenSerializer(many=True, read_only=True)
     parent = serializers.PrimaryKeyRelatedField(
         queryset=Comment.objects.all(),
-        required=False
+        required=False,
     )
     author = serializers.SlugRelatedField(
         read_only=True,
@@ -45,6 +55,7 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
+        list_serializer_class = FilterCommentListSerializer
         fields = (
             'id',
             'author',
@@ -53,3 +64,8 @@ class CommentSerializer(serializers.ModelSerializer):
             'children'
         )
         model = Comment
+
+    def create(self, validated_data):
+        if 'parent' not in validated_data:
+            return super().create(validated_data)
+        return super().create(validated_data)

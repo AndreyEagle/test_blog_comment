@@ -10,6 +10,9 @@ services:
   web:
     build: .
     restart: always
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - '8000:8000'
     volumes:
       - static_value:/app/static/
     depends_on:

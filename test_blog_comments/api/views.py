@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from posts.models import Post
+from posts.models import Post, Comment
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
@@ -25,11 +25,16 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         post = get_object_or_404(Post, id=self.kwargs.get('post_id'))
-        return post.comments.all()
+        queryset = Comment.objects.filter(post=post).select_related(
+            'author',
+            'parent',
+            'post',
+        )
+        return queryset
 
     def perform_create(self, serializer):
         post = get_object_or_404(Post, id=self.kwargs.get('post_id'))
         serializer.save(
             post=post,
-            author=self.request.user,
+            author=self.request.user
         )

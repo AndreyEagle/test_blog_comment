@@ -4,6 +4,7 @@ from django.db import models
 
 User = get_user_model()
 
+
 class Post(models.Model):
     text = models.TextField()
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
@@ -40,10 +41,10 @@ class Comment(models.Model):
         null=True,
         on_delete=models.SET_NULL,
         related_name='children',
-  )
+    )
 
     class Meta:
-      db_table = 'comments'
+        db_table = 'comments'
 
     def __str__(self):
         return self.text[:50]

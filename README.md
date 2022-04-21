@@ -38,7 +38,7 @@ docker-compose exec backend python manage.py createsuperuser
 
 ### Документация API:
 ```
-http://localhost/swagger/
+http://localhost/swagger-ui/
 ```
 ```
 http://localhost/redoc/
